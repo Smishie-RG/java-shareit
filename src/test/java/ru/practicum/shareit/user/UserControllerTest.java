@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,6 +28,7 @@ class UserControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("Создание, получение и просмотр списка пользователей")
     void shouldCreateGetAndReturnAllUsers() throws Exception {
         UserDto created = createUser(
                 "Иван",
@@ -50,6 +52,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Обновление отдельных полей пользователя")
     void shouldUpdateUserFieldsSeparately() throws Exception {
         UserDto created = createUser(
                 "Анна",
@@ -84,6 +87,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Удаление пользователя")
     void shouldDeleteUser() throws Exception {
         UserDto created = createUser(
                 "Пётр",
@@ -98,6 +102,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Ошибка при создании пользователя с некорректными данными")
     void shouldRejectInvalidUser() throws Exception {
         UserDto withoutName = new UserDto(
                 null,
@@ -123,6 +128,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Ошибка при использовании занятого email")
     void shouldRejectDuplicateEmail() throws Exception {
         UserDto first = createUser(
                 "Первый",
@@ -155,6 +161,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Ошибка при обновлении пользователя некорректными данными")
     void shouldRejectInvalidUserUpdate() throws Exception {
         UserDto created = createUser(
                 "Олег",
@@ -185,6 +192,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Ошибка при обращении к неизвестному пользователю")
     void shouldReturnNotFoundForUnknownUser() throws Exception {
         mockMvc.perform(get("/users/{userId}", 999999))
                 .andExpect(status().isNotFound());
