@@ -2,7 +2,6 @@ package ru.practicum.shareit;
 
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingController;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.ItemMapper;
@@ -114,7 +113,6 @@ class MapperAndModelTest {
         assertEquals(item, booking.getItem());
         assertEquals(user, booking.getBooker());
         assertEquals("Запрос", request.getDescription());
-        assertNotNull(new BookingController());
         assertNotNull(new BookingDto());
         assertNotNull(new ItemRequestController());
         assertNotNull(new ItemRequestDto());
