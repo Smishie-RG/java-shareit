@@ -108,6 +108,23 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Создание бронирования при небольшой задержке запроса")
+    void shouldCreateBookingWithSmallDateDelay() throws Exception {
+        UserDto owner = createUser("Владелец задержки", "delay-owner@mail.ru");
+        UserDto booker = createUser("Арендатор задержки", "delay-booker@mail.ru");
+        ItemDto item = createItem(owner.getId(), "Вещь с задержкой", true);
+        LocalDateTime start = LocalDateTime.now().minusNanos(100_000_000);
+
+        createBooking(
+                booker.getId(),
+                item.getId(),
+                start,
+                start.plusDays(1),
+                200
+        );
+    }
+
+    @Test
     @DisplayName("Ошибка при подтверждении бронирования другим пользователем")
     void shouldRejectApprovalByAnotherUser() throws Exception {
         UserDto owner = createUser("Владелец", "approve-owner@mail.ru");

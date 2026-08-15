@@ -182,7 +182,9 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Даты бронирования должны быть указаны");
         }
 
-        if (!start.isAfter(now) || !end.isAfter(start)) {
+        if (start.isBefore(now.minusSeconds(1))
+                || !end.isAfter(now)
+                || !end.isAfter(start)) {
             throw new ValidationException("Некорректные даты бронирования");
         }
     }
