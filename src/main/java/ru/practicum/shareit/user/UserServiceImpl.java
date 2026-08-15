@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EmailAlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -9,24 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
         validateName(userDto.getName());
         validateEmail(userDto.getEmail());
         checkEmail(userDto.getEmail(), null);
 
         User user = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userStorage.add(user));
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
     @Override
+    @Transactional
     public UserDto update(long userId, UserDto userDto) {
         User user = getUser(userId);
 
@@ -41,7 +45,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(userDto.getEmail());
         }
 
-        return UserMapper.toUserDto(userStorage.update(user));
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
     @Override
@@ -52,30 +56,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAll() {
         List<UserDto> result = new ArrayList<>();
-        for (User user : userStorage.getAll()) {
+        for (User user : userRepository.findAll()) {
             result.add(UserMapper.toUserDto(user));
         }
         return result;
     }
 
     @Override
+    @Transactional
     public void delete(long userId) {
         getUser(userId);
-        userStorage.delete(userId);
+        userRepository.deleteById(userId);
     }
 
     private User getUser(long userId) {
-        User user = userStorage.getById(userId);
-        if (user == null) {
-            throw new NotFoundException(
-                    "Пользователь с id " + userId + " не найден"
-            );
-        }
-        return user;
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Пользователь с id " + userId + " не найден"
+                ));
     }
 
     private void checkEmail(String email, Long userId) {
-        User user = userStorage.findByEmail(email);
+        User user = userRepository.findByEmail(email).orElse(null);
         if (user != null && !user.getId().equals(userId)) {
             throw new EmailAlreadyExistsException("Email уже используется");
         }
