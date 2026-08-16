@@ -125,6 +125,25 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Ошибка при неположительных идентификаторах")
+    void shouldRejectNonPositiveIds() throws Exception {
+        mockMvc.perform(get("/bookings/{bookingId}", -1)
+                        .header(USER_HEADER, 1))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/bookings")
+                        .header(USER_HEADER, -1))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/items/{itemId}", -1)
+                        .header(USER_HEADER, 1))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/users/{userId}", -1))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("Ошибка при подтверждении бронирования другим пользователем")
     void shouldRejectApprovalByAnotherUser() throws Exception {
         UserDto owner = createUser("Владелец", "approve-owner@mail.ru");
