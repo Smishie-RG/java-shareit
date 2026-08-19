@@ -36,7 +36,6 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto create(long userId, NewBookingDto bookingDto) {
         User booker = getUser(userId);
         Item item = getItem(bookingDto.getItemId());
-        validateDates(bookingDto);
 
         if (!Boolean.TRUE.equals(item.getAvailable())) {
             throw new ValidationException("Вещь недоступна для бронирования");
@@ -184,22 +183,6 @@ public class BookingServiceImpl implements BookingService {
         return result;
     }
 
-    private void validateDates(NewBookingDto bookingDto) {
-        LocalDateTime start = bookingDto.getStart();
-        LocalDateTime end = bookingDto.getEnd();
-        LocalDateTime now = LocalDateTime.now();
-
-        if (start == null || end == null) {
-            throw new ValidationException("Даты бронирования должны быть указаны");
-        }
-
-        if (start.isBefore(now.minusSeconds(1))
-                || !end.isAfter(now)
-                || !end.isAfter(start)) {
-            throw new ValidationException("Некорректные даты бронирования");
-        }
-    }
-
     private User getUser(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
@@ -222,9 +205,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private PageRequest createPageRequest(int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Некорректные параметры пагинации");
-        }
         return PageRequest.of(from / size, size);
     }
 }

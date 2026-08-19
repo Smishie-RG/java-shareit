@@ -78,8 +78,8 @@ class BookingControllerTest {
     }
 
     @Test
-    @DisplayName("Ошибка при создании некорректного бронирования")
-    void shouldRejectInvalidBooking() throws Exception {
+    @DisplayName("Ошибка при нарушении правил бронирования")
+    void shouldRejectBookingByBusinessRules() throws Exception {
         UserDto owner = createUser("Хозяин вещи", "invalid-owner@mail.ru");
         UserDto booker = createUser("Пользователь", "invalid-booker@mail.ru");
         ItemDto available = createItem(owner.getId(), "Доступная вещь", true);
@@ -88,23 +88,7 @@ class BookingControllerTest {
 
         createBooking(booker.getId(), unavailable.getId(), start, start.plusDays(1), 400);
         createBooking(owner.getId(), available.getId(), start, start.plusDays(1), 404);
-        createBooking(booker.getId(), available.getId(), start, start, 400);
-        createBooking(
-                booker.getId(),
-                available.getId(),
-                LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().plusDays(1),
-                400
-        );
         createBooking(booker.getId(), 999999L, start, start.plusDays(1), 404);
-
-        NewBookingDto withoutStart = new NewBookingDto(
-                available.getId(), null, start.plusDays(1));
-        mockMvc.perform(post("/bookings")
-                        .header(USER_HEADER, booker.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(withoutStart)))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -122,25 +106,6 @@ class BookingControllerTest {
                 start.plusDays(1),
                 200
         );
-    }
-
-    @Test
-    @DisplayName("Ошибка при неположительных идентификаторах")
-    void shouldRejectNonPositiveIds() throws Exception {
-        mockMvc.perform(get("/bookings/{bookingId}", -1)
-                        .header(USER_HEADER, 1))
-                .andExpect(status().isBadRequest());
-
-        mockMvc.perform(get("/bookings")
-                        .header(USER_HEADER, -1))
-                .andExpect(status().isBadRequest());
-
-        mockMvc.perform(get("/items/{itemId}", -1)
-                        .header(USER_HEADER, 1))
-                .andExpect(status().isBadRequest());
-
-        mockMvc.perform(get("/users/{userId}", -1))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -195,10 +160,6 @@ class BookingControllerTest {
         checkBookingList(booker.getId(), "/bookings", "ALL", 5);
         checkBookingList(owner.getId(), "/bookings/owner", "ALL", 5);
 
-        mockMvc.perform(get("/bookings")
-                        .header(USER_HEADER, booker.getId())
-                        .param("state", "UNKNOWN"))
-                .andExpect(status().isBadRequest());
     }
 
     @Test

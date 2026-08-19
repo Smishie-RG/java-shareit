@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EmailAlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +20,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto create(UserDto userDto) {
-        validateName(userDto.getName());
-        validateEmail(userDto.getEmail());
         checkEmail(userDto.getEmail(), null);
 
         User user = UserMapper.toUser(userDto);
@@ -35,12 +32,10 @@ public class UserServiceImpl implements UserService {
         User user = getUser(userId);
 
         if (userDto.getName() != null) {
-            validateName(userDto.getName());
             user.setName(userDto.getName());
         }
 
         if (userDto.getEmail() != null) {
-            validateEmail(userDto.getEmail());
             checkEmail(userDto.getEmail(), userId);
             user.setEmail(userDto.getEmail());
         }
@@ -83,17 +78,4 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new ValidationException("Имя не может быть пустым");
-        }
-    }
-
-    private void validateEmail(String email) {
-        if (email == null
-                || email.isBlank()
-                || !email.matches("^[^@\\s]+@[^@\\s]+$")) {
-            throw new ValidationException("Некорректный email");
-        }
-    }
 }

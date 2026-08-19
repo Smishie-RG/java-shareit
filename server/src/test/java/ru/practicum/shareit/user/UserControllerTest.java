@@ -102,32 +102,6 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Ошибка при создании пользователя с некорректными данными")
-    void shouldRejectInvalidUser() throws Exception {
-        UserDto withoutName = new UserDto(
-                null,
-                "",
-                "no-name@mail.ru"
-        );
-
-        UserDto withoutEmail = new UserDto(
-                null,
-                "Без почты",
-                null
-        );
-
-        UserDto invalidEmail = new UserDto(
-                null,
-                "Неверная почта",
-                "user.com"
-        );
-
-        performCreate(withoutName, 400);
-        performCreate(withoutEmail, 400);
-        performCreate(invalidEmail, 400);
-    }
-
-    @Test
     @DisplayName("Ошибка при использовании занятого email")
     void shouldRejectDuplicateEmail() throws Exception {
         UserDto first = createUser(
@@ -158,37 +132,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isConflict());
-    }
-
-    @Test
-    @DisplayName("Ошибка при обновлении пользователя некорректными данными")
-    void shouldRejectInvalidUserUpdate() throws Exception {
-        UserDto created = createUser(
-                "Олег",
-                "oleg-validation@mail.ru"
-        );
-
-        UserDto emptyName = new UserDto(
-                null,
-                " ",
-                null
-        );
-
-        mockMvc.perform(patch("/users/{userId}", created.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(emptyName)))
-                .andExpect(status().isBadRequest());
-
-        UserDto invalidEmail = new UserDto(
-                null,
-                null,
-                "wrong-email"
-        );
-
-        mockMvc.perform(patch("/users/{userId}", created.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidEmail)))
-                .andExpect(status().isBadRequest());
     }
 
     @Test

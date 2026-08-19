@@ -49,7 +49,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto create(long userId, ItemDto itemDto) {
         User owner = getUser(userId);
-        validateNewItem(itemDto);
 
         ItemRequest request = null;
         if (itemDto.getRequestId() != null) {
@@ -76,18 +75,10 @@ public class ItemServiceImpl implements ItemService {
         }
 
         if (itemDto.getName() != null) {
-            validateText(
-                    itemDto.getName(),
-                    "Название не может быть пустым"
-            );
             item.setName(itemDto.getName());
         }
 
         if (itemDto.getDescription() != null) {
-            validateText(
-                    itemDto.getDescription(),
-                    "Описание не может быть пустым"
-            );
             item.setDescription(itemDto.getDescription());
         }
 
@@ -226,33 +217,7 @@ public class ItemServiceImpl implements ItemService {
                 ));
     }
 
-    private void validateNewItem(ItemDto itemDto) {
-        validateText(
-                itemDto.getName(),
-                "Название не может быть пустым"
-        );
-        validateText(
-                itemDto.getDescription(),
-                "Описание не может быть пустым"
-        );
-
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException(
-                    "Статус доступности должен быть указан"
-            );
-        }
-    }
-
-    private void validateText(String text, String message) {
-        if (text == null || text.isBlank()) {
-            throw new ValidationException(message);
-        }
-    }
-
     private PageRequest createPageRequest(int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Некорректные параметры пагинации");
-        }
         return PageRequest.of(
                 from / size,
                 size,

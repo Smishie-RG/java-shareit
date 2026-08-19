@@ -202,42 +202,6 @@ class ItemControllerTest {
     }
 
     @Test
-    void shouldRejectInvalidItem() throws Exception {
-        UserDto owner = createUser(
-                "Валидация",
-                "item-validation@mail.ru"
-        );
-
-        ItemDto withoutName = new ItemDto(
-                null,
-                "",
-                "Описание",
-                true,
-                null
-        );
-
-        ItemDto withoutDescription = new ItemDto(
-                null,
-                "Вещь",
-                null,
-                true,
-                null
-        );
-
-        ItemDto withoutAvailable = new ItemDto(
-                null,
-                "Вещь",
-                "Описание",
-                null,
-                null
-        );
-
-        performCreate(owner.getId(), withoutName, 400);
-        performCreate(owner.getId(), withoutDescription, 400);
-        performCreate(owner.getId(), withoutAvailable, 400);
-    }
-
-    @Test
     void shouldRejectRequestWithoutHeaderAndUnknownUser() throws Exception {
         ItemDto item = new ItemDto(
                 null,
@@ -287,49 +251,6 @@ class ItemControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void shouldRejectInvalidItemUpdate() throws Exception {
-        UserDto owner = createUser(
-                "Проверка обновления",
-                "update-validation@mail.ru"
-        );
-
-        ItemDto item = createItem(
-                owner.getId(),
-                "Лопата",
-                "Садовая",
-                true
-        );
-
-        ItemDto emptyName = new ItemDto(
-                null,
-                " ",
-                null,
-                null,
-                null
-        );
-
-        mockMvc.perform(patch("/items/{itemId}", item.getId())
-                        .header(USER_HEADER, owner.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(emptyName)))
-                .andExpect(status().isBadRequest());
-
-        ItemDto emptyDescription = new ItemDto(
-                null,
-                null,
-                "",
-                null,
-                null
-        );
-
-        mockMvc.perform(patch("/items/{itemId}", item.getId())
-                        .header(USER_HEADER, owner.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(emptyDescription)))
-                .andExpect(status().isBadRequest());
     }
 
     @Test

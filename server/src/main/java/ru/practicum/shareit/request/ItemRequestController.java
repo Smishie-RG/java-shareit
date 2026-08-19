@@ -1,9 +1,5 @@
 package ru.practicum.shareit.request;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +12,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 
 import java.util.List;
 
-@Validated
 @RestController
 @RequestMapping("/requests")
 public class ItemRequestController {
@@ -30,29 +25,29 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDto create(
-            @RequestHeader(USER_HEADER) @Positive long userId,
-            @Valid @RequestBody ItemRequestDto requestDto) {
+            @RequestHeader(USER_HEADER) long userId,
+            @RequestBody ItemRequestDto requestDto) {
         return requestService.create(userId, requestDto);
     }
 
     @GetMapping
     public List<ItemRequestDto> getOwnRequests(
-            @RequestHeader(USER_HEADER) @Positive long userId) {
+            @RequestHeader(USER_HEADER) long userId) {
         return requestService.getOwnRequests(userId);
     }
 
     @GetMapping("/all")
     public List<ItemRequestDto> getAllRequests(
-            @RequestHeader(USER_HEADER) @Positive long userId,
-            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-            @RequestParam(defaultValue = "10") @Positive int size) {
+            @RequestHeader(USER_HEADER) long userId,
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
         return requestService.getAllRequests(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
     public ItemRequestDto getById(
-            @RequestHeader(USER_HEADER) @Positive long userId,
-            @PathVariable @Positive long requestId) {
+            @RequestHeader(USER_HEADER) long userId,
+            @PathVariable long requestId) {
         return requestService.getById(userId, requestId);
     }
 }

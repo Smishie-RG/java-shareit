@@ -5,7 +5,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.User;
@@ -34,11 +33,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public ItemRequestDto create(long userId, ItemRequestDto requestDto) {
         User requestor = getUser(userId);
-        if (requestDto.getDescription() == null
-                || requestDto.getDescription().isBlank()) {
-            throw new ValidationException(
-                    "Описание запроса не может быть пустым");
-        }
 
         ItemRequest request = new ItemRequest(
                 null,
@@ -60,9 +54,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> getAllRequests(long userId, int from, int size) {
         getUser(userId);
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Некорректные параметры пагинации");
-        }
         PageRequest pageRequest = PageRequest.of(
                 from / size,
                 size,

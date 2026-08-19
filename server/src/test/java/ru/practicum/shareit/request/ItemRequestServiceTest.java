@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -16,7 +15,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -80,13 +78,4 @@ class ItemRequestServiceTest {
         assertEquals(2, otherRequests.size());
     }
 
-    @Test
-    void shouldRejectBlankDescription() {
-        UserDto user = userService.create(
-                new UserDto(null, "Автор", "blank@example.com"));
-
-        assertThrows(ValidationException.class,
-                () -> requestService.create(user.getId(),
-                        new ItemRequestDto(null, " ", null, null)));
-    }
 }
